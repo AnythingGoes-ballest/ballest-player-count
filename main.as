@@ -1,15 +1,16 @@
-// Player Count: inside a map, the leaderboard's title shows how many players have a time on that track:
+// Player Count: how many players are on a leaderboard.
 //
-//   leaderboard · 12,345
+//   inside a map, after the leaderboard's title:     leaderboard · 12,345
+//   on the main menu, before the overall bar's label: 30,123  overall
 //
 // (just the number: with "players" after it the title no longer fits beside the global / friends buttons)
 //
-// The number is Steam's entry count for the leaderboard on screen (Leaderboard::Players()), asked again every few
-// seconds, so it follows the track and new times as they come in.
+// The numbers are Steam's entry counts for those leaderboards (Leaderboard::Players(), Leaderboard::OverallPlayers()),
+// asked again every few seconds, so they follow the track, the season and new times as they come in.
 
 const double CHECK_EVERY = 2.0;       // seconds
 double lastCheck = -100;
-string shownNote;
+string shownNote, shownOverall;
 
 // 12345 -> "12,345"
 string Grouped(int n)
@@ -43,5 +44,14 @@ void Update(float dt)
         shownNote = note;
         if (note != "")
             Log::Info("leaderboard: " + Grouped(players) + " players");
+    }
+    int overall = Leaderboard::OverallPlayers();
+    string overallNote = overall > 0 ? Grouped(overall) : "";
+    if (overallNote != shownOverall)
+    {
+        Leaderboard::SetOverallNote(overallNote);
+        shownOverall = overallNote;
+        if (overallNote != "")
+            Log::Info("overall leaderboard: " + overallNote + " players");
     }
 }
